@@ -19,6 +19,10 @@ const Navbar = ({
   setRoomtype,
   ApiOnSearch,
   single,
+  latitude,
+  setLatitude,
+  longitude,
+  setLongitude,
 }) => {
   const navigate = useNavigate();
 
@@ -50,7 +54,7 @@ const Navbar = ({
         if (ref.current && !ref.current.contains(event.target)) {
           setTimeout(() => {
             setExpand(false);
-          }, 100);
+          }, 200);
         }
       }
       // Bind the event listener
@@ -65,7 +69,6 @@ const Navbar = ({
   const ExpandedNavRef = useRef(null);
   CloseProfile(ProfileRef);
   CloseExpandedNav(ExpandedNavRef);
-
   return (
     <>
       <div
@@ -95,6 +98,10 @@ const Navbar = ({
             ApiOnSearch={ApiOnSearch}
             expand={expand}
             setExpand={setExpand}
+            latitude={latitude}
+            setLatitude={setLatitude}
+            longitude={longitude}
+            setLongitude={setLongitude}
           />
         ) : (
           <div className="flex       justify-center ">

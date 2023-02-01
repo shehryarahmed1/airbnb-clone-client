@@ -10,6 +10,10 @@ const ExpandedNav = ({
   setRoomtype,
   expand,
   setExpand,
+  latitude,
+  setLatitude,
+  longitude,
+  setLongitude,
 }) => {
   function useOutsideAlerter(ref) {
     useEffect(() => {
@@ -36,6 +40,8 @@ const ExpandedNav = ({
   const [PrivateRoom, setPrivateRoom] = useState();
   const [EntirePlace, setEntirePlace] = useState();
   const [SharedRoom, setSharedRoom] = useState();
+  const [placeholderLatitude, setPlaceholderLatitude] = useState(0); // So the maps doesnot render without click on pink search
+  const [placeholderLongitude, setPlaceholderLongitude] = useState(0); // So the maps doesnot render without click on pink search
   const wrapperRef = useRef(null);
   useOutsideAlerter(wrapperRef);
 
@@ -121,7 +127,8 @@ const ExpandedNav = ({
                   setTimeout(() => {
                     setExpand(false);
                   }, 100);
-                  console.log(guests);
+                  setLatitude(placeholderLatitude);
+                  setLongitude(placeholderLongitude);
                 }}
                 className="hover:bg-[#e2346e]     bg-[#FF385C]  cursor-pointer  transition       text-white  px-3 py-2  mx-4    rounded-full"
               >
@@ -216,6 +223,9 @@ const ExpandedNav = ({
                       {locations.map((location) => (
                         <div
                           onClick={() => {
+                            setLocationInp("");
+                            setPlaceholderLatitude(location.lat);
+                            setPlaceholderLongitude(location.lon);
                             if (location.state == undefined) {
                               setLocationInp(
                                 `${location.name}, ${location.country}`

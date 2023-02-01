@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-const Room = ({ room, longitude, latitude, TextAbstract, expand }) => {
+const Room = ({ room, currlongitude, currlatitude, TextAbstract, expand }) => {
   const navigate = useNavigate();
 
   const [totalReview, setTotalReview] = useState(0);
@@ -36,7 +36,9 @@ const Room = ({ room, longitude, latitude, TextAbstract, expand }) => {
       // calculate the result
       return c * r;
     }
-    setDistance(distance(latitude, room.latitude, longitude, room.longitude));
+    setDistance(
+      distance(currlatitude, room.latitude, currlongitude, room.longitude)
+    );
   }, []);
 
   useEffect(() => {

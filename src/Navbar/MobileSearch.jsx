@@ -36,8 +36,6 @@ const MobileSearch = ({
 
   const [locations, setLocations] = useState([]);
   const [showLocation, setShowlocation] = useState(true);
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
   useEffect(() => {
     if (true) {
       if (locationInp.length <= 0) {
@@ -95,8 +93,6 @@ const MobileSearch = ({
                       {locations.map((location) => (
                         <div
                           onClick={() => {
-                            setLatitude(location.lat);
-                            setLongitude(location.lon);
                             if (location.state == undefined) {
                               setLocationInp(
                                 `${location.name}, ${location.country}`
@@ -234,16 +230,7 @@ const MobileSearch = ({
             </p>
             <button className="right  px-5 rounded-lg font-semibold  flex text-center items-center   h-12 my-3    mx-5 text-white   bg-[#de1463]">
               <i className="fa-solid fa-magnifying-glass"></i>
-              <p
-                onClick={() => {
-                  alert(latitude);
-                  alert(longitude);
-                  alert(locationInp);
-                }}
-                className="mx-3"
-              >
-                Search
-              </p>
+              <p className="mx-3">Search</p>
             </button>
           </div>
         </div>

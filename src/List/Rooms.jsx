@@ -4,6 +4,7 @@ import Room from "./Room";
 import Pagination from "./Pagination";
 import Selection from "./Selection";
 import ForceRoomEnd from "./ForceRoomEnd";
+import ExploreMap from "./ExploreMap";
 
 const Rooms = ({
   roomType,
@@ -32,22 +33,25 @@ const Rooms = ({
   setSort,
   guests,
   setGuests,
+  latitude,
+  setLatitude,
+  longitude,
+  setLongitude,
 }) => {
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
+  const [currlatitude, setcurrLatitude] = useState("");
+  const [currlongitude, setcurrLongitude] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
   const n = 8; // Number to repeat the loading rooms placeholder
   const b = 13; // Number to repeat the loading category placeholder
 
   useEffect(() => {
-    console.log(expand);
-  }, [expand]);
-
-  useEffect(() => {
-    setRooms([]);
-    setLoading(true);
-    setPage(1);
-    setTheEnd(false);
+    if (!showMap) {
+      setRooms([]);
+      setLoading(true);
+      setPage(1);
+      setTheEnd(false);
+    }
   }, [cat]);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ const Rooms = ({
   }, [locationInp]);
 
   useEffect(() => {
-    if (!theEnd) {
+    if (!theEnd || !showMap) {
       axios
         .get(
           `http://localhost:7000/api/main?page=${page}&sort=${sort},${order}&type=${roomType}&cat=${cat}&place=${locationInp}&guests=${guests}`
@@ -84,8 +88,8 @@ const Rooms = ({
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(function (position) {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
+        setcurrLatitude(position.coords.latitude);
+        setcurrLatitude(position.coords.longitude);
         console.log("Latitude is :", position.coords.latitude);
         console.log("Longitude is :", position.coords.longitude);
       });
@@ -180,17 +184,33 @@ const Rooms = ({
             ) : (
               <>
                 {rooms.length > 0 ? (
-                  rooms.map((room) => (
-                    <>
-                      <Room
-                        room={room}
-                        expand={expand}
-                        latitude={latitude}
-                        longitude={longitude}
-                        TextAbstract={TextAbstract}
-                      />
-                    </>
-                  ))
+                  <>
+                    {showMap ? (
+                      <>
+                        <ExploreMap
+                          latitude={latitude}
+                          setLatitude={setLatitude}
+                          longitude={longitude}
+                          setLongitude={setLongitude}
+                          locationInp={locationInp}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {rooms.map((room) => (
+                          <>
+                            <Room
+                              room={room}
+                              expand={expand}
+                              currlatitude={currlatitude}
+                              currlongitude={currlongitude}
+                              TextAbstract={TextAbstract}
+                            />
+                          </>
+                        ))}
+                      </>
+                    )}
+                  </>
                 ) : (
                   <div className="   my-20">
                     <h1 className="text-xl   font-semibold ">No rooms found</h1>
@@ -206,6 +226,27 @@ const Rooms = ({
           </div> */}
         </div>
       </>
+
+      {rooms?.length > 0 ? (
+        <div
+          onClick={() => {
+            setShowMap((prevCheck) => !prevCheck);
+          }}
+          class=" inset-x-0 sticky cursor-pointer  py-2.5 mx-auto w-36  bottom-16 h-12 ...      bg-[#222222] rounded-3xl"
+        >
+          <p className="text-white font-medium text-center select-none">
+            {showMap ? (
+              <>
+                Show list&nbsp;<i class="fa-solid fa-list"></i>
+              </>
+            ) : (
+              <>
+                Show map&nbsp;<i class="fa-solid fa-map"></i>
+              </>
+            )}
+          </p>
+        </div>
+      ) : null}
     </>
   );
 };

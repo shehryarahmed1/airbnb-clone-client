@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "./App.css";
@@ -22,6 +22,8 @@ function App() {
   const [roomType, setRoomtype] = useState("");
   const [guests, setGuests] = useState("");
   const [showProfile, setShowprofile] = useState(false);
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   // ExpandedNav-Rooms
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("guests");
@@ -50,6 +52,15 @@ function App() {
         console.error("There was an error!", error);
       });
   };
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      setLatitude(position.coords.latitude);
+      setLongitude(position.coords.longitude);
+      console.log("Latitude is :", position.coords.latitude);
+      console.log("Longitude is :", position.coords.longitude);
+    });
+  }, []);
+
   return (
     <>
       <BrowserRouter>
@@ -99,6 +110,10 @@ function App() {
                       setRoomtype={setRoomtype}
                       cat={cat}
                       setCat={setCat}
+                      latitude={latitude}
+                      setLatitude={setLatitude}
+                      longitude={longitude}
+                      setLongitude={setLongitude}
                     />
                     <hr />
                     <br />
@@ -133,6 +148,10 @@ function App() {
                           setSort={setSort}
                           guests={guests}
                           setGuests={setGuests}
+                          latitude={latitude}
+                          setLatitude={setLatitude}
+                          longitude={longitude}
+                          setLongitude={setLongitude}
                         />
                       </div>
                       <div className="2md:hidden block ">

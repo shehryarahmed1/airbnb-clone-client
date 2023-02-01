@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { DayPicker } from "react-day-picker";
 
 import toast, { Toaster } from "react-hot-toast";
-import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "react-day-picker/dist/style.css";
 import { useState } from "react";
@@ -12,6 +12,8 @@ import Navbar from "../Navbar/Navbar";
 import { Carousel } from "react-responsive-carousel";
 import MobileNav from "../Navbar/MobileNav";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { useNavigate } from "react-router-dom";
+
 const Single = ({
   expand,
   setExpand,
@@ -43,6 +45,7 @@ const Single = ({
   const [reviewRatio, setreviewRatio] = useState(0);
   const [hasname, setHasname] = useState(false);
   const [reviewstoshow, setReviewstoshow] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log(reviews);
@@ -215,7 +218,7 @@ const Single = ({
       <div className="top text-center items-center  2md:hidden   py-3 flex justify-between">
         <i
           onClick={() => {
-            setShowsearch(false);
+            navigate("/");
           }}
           className="fa-solid fa-arrow-left mx-6   p-2 border border-gray-400 rounded-full bg-white  "
         ></i>
@@ -292,7 +295,7 @@ const Single = ({
             {room.total_bathrooms} baths · {room.total_occupancy} sq. ft
           </p>
           <br />
-          <p className="font-medium text-2xl w-96">What this place offers</p>
+          <p className="font-medium text-2xl  w-96">What this place offers</p>
           <br />
           <div className=" ">
             {room.has_tv ? (
@@ -381,6 +384,9 @@ const Single = ({
               </>
             )}
           </div>
+        </div>
+        <div className="outline">
+          <h1>Hello</h1>
         </div>
       </div>
     </div>
