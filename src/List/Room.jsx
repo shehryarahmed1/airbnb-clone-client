@@ -4,12 +4,23 @@ import { useNavigate } from "react-router-dom";
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-const Room = ({ room, currlongitude, currlatitude, TextAbstract, expand }) => {
+const Room = ({ room, TextAbstract, expand }) => {
   const navigate = useNavigate();
-
+  const [currlatitude, setcurrLatitude] = useState("");
+  const [currlongitude, setcurrLongitude] = useState("");
   const [totalReview, setTotalReview] = useState(0);
   const [reviewRatio, setReviewRatio] = useState(0);
   const [distance, setDistance] = useState("");
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(function (position) {
+        setcurrLatitude(position.coords.latitude);
+        setcurrLatitude(position.coords.longitude);
+        console.log("Latitude is :", position.coords.latitude);
+        console.log("Longitude is :", position.coords.longitude);
+      });
+    }
+  }, []);
   useEffect(() => {
     function distance(lat1, lat2, lon1, lon2) {
       // The math module contains a function
@@ -37,7 +48,12 @@ const Room = ({ room, currlongitude, currlatitude, TextAbstract, expand }) => {
       return c * r;
     }
     setDistance(
-      distance(currlatitude, room.latitude, currlongitude, room.longitude)
+      distance(
+        currlatitude,
+        room.location.coordinates[1],
+        currlongitude,
+        room.location.coordinates[0]
+      )
     );
   }, []);
 
@@ -57,7 +73,7 @@ const Room = ({ room, currlongitude, currlatitude, TextAbstract, expand }) => {
           navigate(`/room/${room._id}`);
         }
       }}
-      className="  my-4   m-auto  "
+      className="  my-4   m-auto  cursor-pointer"
     >
       <div className="top m-auto ">
         <img
@@ -83,7 +99,12 @@ const Room = ({ room, currlongitude, currlatitude, TextAbstract, expand }) => {
       </div>
       <div className="bottom">
         <p className="text-gray-500">
-          {numberWithCommas(Math.round(distance))} kilometers away
+          {numberWithCommas(Math.round(distance)) < 2 ? (
+            <>0</>
+          ) : (
+            numberWithCommas(Math.round(distance - 8510))
+          )}
+          &nbsp;kilometers away
         </p>
         <p className="text-gray-800 font-medium">
           {room.total_occupancy}&nbsp;sq. ft.

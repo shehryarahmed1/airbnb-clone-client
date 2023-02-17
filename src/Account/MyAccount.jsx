@@ -1,40 +1,87 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
 import { app, storage } from "../Firebaseconfig/firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import axios from "axios";
-const CreateUser = () => {
-  const navigate = useNavigate();
-
-  const [buttonLoading, setbuttonLoading] = useState(false);
+const MyAccount = () => {
+  const [name, setName] = useState("");
+  const [work, setWork] = useState("");
+  const [about, setAbout] = useState("");
+  const [phone, setPhone] = useState("");
+  const [image, setImage] = useState("");
+  const [progress, setProgress] = useState(100);
   const [showCountry, setShowCountry] = useState(false);
   const [countryInp, setCountryInp] = useState("");
-  const [image, setImage] = useState(
-    "https://t4.ftcdn.net/jpg/03/31/69/91/360_F_331699188_lRpvqxO5QRtwOM05gR50ImaaJgBx68vi.jpg"
-  );
-  const [progress, setProgress] = useState();
-  const [imageSelected, setImageSelected] = useState(false);
   const [countries, setCountries] = useState([]);
-  const [values, setValues] = useState([
-    {
-      name: "",
-      email: "",
-      work: "",
-      about: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-    },
-  ]);
-  function handleChange(evt) {
-    const value = evt.target.value;
-    setValues({
-      ...values,
-      [evt.target.name]: value,
-    });
-  }
+  const [prevEmail, setPrevEmail] = useState("");
+  const [email, setEmail] = useState("");
+  const [buttonLoading, setbuttonLoading] = useState("");
+
+  useEffect(() => {
+    if (countryInp.length > 0) {
+      axios
+        .get(`https://restcountries.com/v3.1/name/${countryInp}`)
+        .then((response) => {
+          setCountries(response.data);
+
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+    }
+  }, [countryInp]);
+
+  const handleSubmit = async () => {
+    try {
+      const { data } = await axios({
+        method: "put",
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+        url: "http://localhost:7000/api/update/user",
+        data: {
+          name,
+          work,
+          country: countryInp,
+          phone,
+          about,
+          profile_image: image,
+        },
+      });
+
+      console.log(data);
+      window.location.reload(false);
+    } catch (err) {
+      if (err.response.status === 422) {
+        toast.error(err.response.message);
+      } else {
+        console.log(err.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const headers = {
+      token: localStorage.getItem("token"),
+    };
+    axios
+      .get("http://localhost:7000/api/get/my/user", { headers })
+      .then((response) => {
+        setName(response.data[0].name);
+        setWork(response.data[0].work);
+        setAbout(response.data[0].about);
+        setPhone(response.data[0].phone);
+        setImage(response.data[0].profile_image);
+        setPrevEmail(response.data[0].email);
+        setEmail(response.data[0].email);
+        setCountryInp(response.data[0].country);
+        console.log(response.data[0]);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  }, []);
   function handleImgChange(e) {
     const element = e.target.files[0];
     const storageRef = ref(
@@ -57,90 +104,94 @@ const CreateUser = () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log("File available at", downloadURL);
           setImage(downloadURL);
-          setImageSelected(true);
           // toast.success("Room created");
         });
       }
     );
   }
-  useEffect(() => {
-    if (countryInp.length > 0) {
-      axios
-        .get(`https://restcountries.com/v3.1/name/${countryInp}`)
-        .then((response) => {
-          setCountries(response.data);
-
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("There was an error!", error);
-        });
-    }
-  }, [countryInp]);
-
   return (
-    <div className="bg-[#FF595D]">
+    <div className="bg-[#FF595D]   h-[5000px]  pt-16">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="bg-white p-5 rounded-lg w-96   ">
-        <div className="create m-auto w-28  py-3  ">
-          <div className="font-semibold text-3xl text-[#555555] ">Sign up</div>
+      <div className="bg-white p-5  m-auto  rounded-lg w-96   ">
+        <div className="create m-auto w-16  py-3  ">
+          <img
+            src={image}
+            alt=""
+            className="h-16 w-16 rounded-full object-cover"
+          />
+          <div class="flex items-center justify-center w-full">
+            <label
+              for="dropzone-file"
+              class="flex flex-col items-center justify-center w-full h-7    rounded-lg cursor-pointer     "
+            >
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <p className="font-semibold cursor-pointer underline text-xs  mt-2 text-center ">
+                  {progress != 100 ? <>{progress} %</> : <>Edit photo</>}
+                </p>
+              </div>
+              <input
+                id="dropzone-file"
+                type="file"
+                class="hidden"
+                onChange={handleImgChange}
+              />
+            </label>
+          </div>
         </div>
+
         <div className="fields py-5   w-72  mx-auto">
           <p className="text-sm mx-2.5">Name</p>
           <input
             type="text"
-            value={values.name}
-            onChange={handleChange}
-            name="name"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
             className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
           />
         </div>
-        <div className="fields py-5   w-72  mx-auto">
-          <p className="text-sm mx-2.5">Email</p>
-          <input
-            type="email"
-            value={values.email}
-            onChange={handleChange}
-            name="email"
-            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
-          />
-        </div>
-        <div className="fields py-5   w-72  mx-auto">
-          <p className="text-sm mx-2.5">Password</p>
-          <input
-            type="password"
-            value={values.password}
-            onChange={handleChange}
-            name="password"
-            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
-          />
-        </div>
-        <div className="fields py-5   w-72  mx-auto">
-          <p className="text-sm mx-2.5">Confirm Passowrd</p>
-          <input
-            type="password"
-            value={values.confirmPassword}
-            onChange={handleChange}
-            name="confirmPassword"
-            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
-          />
-        </div>
+
         <div className="fields py-5   w-72  mx-auto">
           <p className="text-sm mx-2.5">Work</p>
           <input
             type="text"
-            value={values.work}
-            onChange={handleChange}
-            name="work"
+            value={work}
+            onChange={(e) => {
+              setWork(e.target.value);
+            }}
             className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
           />
         </div>
+
+        <div className="fields py-5   w-72  mx-auto">
+          <p className="text-sm mx-2.5">About</p>
+          <input
+            type="text"
+            value={about}
+            onChange={(e) => {
+              setAbout(e.target.value);
+            }}
+            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
+          />
+        </div>
+
+        <div className="fields py-5   w-72  mx-auto">
+          <p className="text-sm mx-2.5">Phone</p>
+          <input
+            type="number"
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+            }}
+            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
+          />
+        </div>
+
         <div className="fields py-5   w-72  mx-auto">
           <p className="text-sm mx-2.5">Country</p>
           <input
             type="text"
             value={countryInp}
-            name="country"
             onFocus={() => {
               setShowCountry(true);
 
@@ -210,121 +261,18 @@ const CreateUser = () => {
             </>
           ) : null}
         </div>
-        <div className="fields py-5   w-72  mx-auto">
-          <p className="text-sm mx-2.5">Phone</p>
-          <input
-            value={values.phone}
-            onChange={handleChange}
-            name="phone"
-            type="number"
-            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
-          />
-        </div>
-        <div className="fields py-5   w-72  mx-auto">
-          <p className="text-sm mx-2.5">About</p>
-          <input
-            value={values.about}
-            onChange={handleChange}
-            name="about"
-            type="text"
-            className="border  h-9 w-72 p-2 py-5 mt-3 text-sm   outline-none  border-gray-200 rounded-md bg-[#F7F7F7]"
-          />
-        </div>
-        <div className="mx-7">
-          <label
-            className="block mb-2 text-sm font-medium  "
-            htmlFor="file_input"
-          >
-            {imageSelected ? (
-              <>
-                <img
-                  src={image}
-                  className="h-10 w-10 object-cover rounded-md border border-gray-200"
-                  alt=""
-                />
-              </>
-            ) : (
-              <>
-                {progress ? <>{progress}%&nbsp;</> : null}
-                Choose a profile picture?
-              </>
-            )}
-          </label>
-          <input
-            className="block  p-1  w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 "
-            id="file_input"
-            type="file"
-            onChange={handleImgChange}
-          />
-        </div>
-        {values.password == values.confirmPassword ? null : (
-          <div className="px-8 text-sm text-red-600">
-            Password is not matching{" "}
-          </div>
-        )}
 
         <br />
-        <div
-          onClick={() => {
-            console.log(values);
-          }}
-          className=" m-auto w-72 "
-        >
-          {!values.name ||
-          !values.email ||
-          !values.password ||
-          !values.confirmPassword ||
-          !values.work ||
-          !countryInp ||
-          !values.phone ||
-          !values.about ||
-          values.password != values.confirmPassword ? (
+        <div className=" m-auto w-72 ">
+          {false ? (
             <button className="p-1.5 rounded-md cursor-default   bg-[#545454] text-white font-medium w-72  ">
-              Sign up
+              Update
             </button>
           ) : (
             <button
               onClick={() => {
                 if (!buttonLoading) {
-                  setbuttonLoading(true);
-                  const requestOptions = {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name: values.name,
-                      email: values.email,
-                      password: values.password,
-                      work: values.work,
-                      about: values.about,
-                      phone: values.phone,
-                      country: countryInp,
-                      profile_image: image,
-                    }),
-                  };
-                  fetch("http://localhost:7000/signup", requestOptions)
-                    .then(async (response) => {
-                      const isJson = response.headers
-                        .get("content-type")
-                        ?.includes("application/json");
-                      const data = isJson && (await response.json());
-
-                      // check for error response
-                      if (!response.ok) {
-                        // get error message from body or default to response status
-                        console.log(data);
-                        // const error = (data && data.message) || response.status;
-                        setbuttonLoading(false);
-                        return toast.error(data.error);
-                      }
-                      console.log(data);
-                      setbuttonLoading(false);
-                      setTimeout(() => {
-                        navigate("/login");
-                      }, 100);
-                    })
-                    .catch((error) => {
-                      console.error("There was an error!", error);
-                    });
+                  handleSubmit();
                 }
               }}
               className="p-1.5 rounded-md   bg-[#333333] hover:bg-[#333333f3] text-white font-medium w-72  "
@@ -351,32 +299,19 @@ const CreateUser = () => {
                     </svg>
                     <span className="sr-only">Loading...</span>
                   </div>
-                  <p>Sign up</p>
+                  <p>Update</p>
                 </div>
               ) : (
-                <> Sign up</>
+                <> Update</>
               )}
             </button>
           )}
         </div>
         <br />
         <br />
-
-        <div className="flex  w-[15rem] text-[#A9A6AE] mx-auto">
-          <div className=" ">Don't have an account?&nbsp;</div>
-          <div
-            onClick={() => {
-              navigate("/login");
-            }}
-            className="underline cursor-pointer"
-          >
-            Sign in{" "}
-          </div>
-        </div>
-        <br />
       </div>{" "}
     </div>
   );
 };
 
-export default CreateUser;
+export default MyAccount;

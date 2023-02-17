@@ -191,7 +191,7 @@ const MobileSearch = ({
                       </div>
                       <div
                         onClick={() => {
-                          setRoomtype("Entire place");
+                          setRoomtype("Entire home");
                           setShowtype(false);
                         }}
                         className="block flex cursor-pointer text-center items-center px-4 py-2 text-sm text-gray-500 rounded-lg  hover:bg-gray-50  "
@@ -228,7 +228,17 @@ const MobileSearch = ({
             >
               Clear all
             </p>
-            <button className="right  px-5 rounded-lg font-semibold  flex text-center items-center   h-12 my-3    mx-5 text-white   bg-[#de1463]">
+            <button 
+            
+            onClick={()=>{
+              setShowsearch(false)
+            }}
+            
+            className="right  px-5 rounded-lg font-semibold  flex text-center items-center   h-12 my-3    mx-5 text-white
+            
+            
+            
+            bg-[#de1463]">
               <i className="fa-solid fa-magnifying-glass"></i>
               <p className="mx-3">Search</p>
             </button>

@@ -49,8 +49,8 @@ const Single = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(range);
-  }, [range]);
+    console.log(User);
+  }, [User]);
   useEffect(() => {
     for (let index = 0; index < reviews.length; index++) {
       const element = reviews[index];
@@ -148,60 +148,64 @@ const Single = ({
 
   let disabledDates = [];
   useEffect(() => {
-    axios.get(`http://localhost:7000/${id}`).then((res) => {
-      setRoom(res.data);
-      console.log(res.data);
-      setUser(res.data.owner_id);
-      setReviews(res.data.reviews);
-      setReviewstoshow(res.data.reviews);
-      setShow(true);
-      //(res.data.reservations);
-      // for (let index = 0; index < res.data.reservations.length; index++) {
-      //   const element = res.data.reservations[index];
-      //   //([{dateEnd:element.dateEnd}]);
-      // }
-      //(res.data.reservations.length);
-      for (let index = 0; index < res.data.reservations.length; index++) {
-        const element = res.data.reservations[index];
+    axios
+      .get(`http://localhost:7000/${id}`)
+      .then((res) => {
+        setRoom(res.data);
 
-        // //(element);
-        const dateStart = new Date(res.data.reservations[index].dateStart);
-        const dateEnd = new Date(res.data.reservations[index].dateEnd);
-        const date = new Date(dateStart.getTime());
-        // //(date);
-
-        var dates = [];
-        while (date <= dateEnd) {
-          dates.push(new Date(date));
-          date.setDate(date.getDate() + 1);
-        }
-
-        dates.pop();
-        // setDisabled([...disabled, dates]);
-        disabledDates.push(dates);
-        // //(dates);
-        for (let index = 0; index < dates.length; index++) {
-          const element = dates[index];
-          //(element);
-          setDisabled((current) => [...current, element]);
-        }
-        // //("pushed");
-        // //(dates);
-        // //(JSON.stringify(dates));
-        // while (dateStart < dateEnd) {
-        //   //("dateStart");
-        //   //(dateEnd);
-        //   let newDate = dateStart.getDate() + 1;
-        //   let loop = new Date(newDate);
+        setUser(res.data.owner_id);
+        setReviews(res.data.reviews);
+        setReviewstoshow(res.data.reviews);
+        setShow(true);
+        //(res.data.reservations);
+        // for (let index = 0; index < res.data.reservations.length; index++) {
+        //   const element = res.data.reservations[index];
+        //   //([{dateEnd:element.dateEnd}]);
         // }
-      }
-      // this.setState({ persons });
-    });
+        //(res.data.reservations.length);
+        for (let index = 0; index < res.data.reservations.length; index++) {
+          const element = res.data.reservations[index];
+
+          // //(element);
+          const dateStart = new Date(res.data.reservations[index].dateStart);
+          const dateEnd = new Date(res.data.reservations[index].dateEnd);
+          const date = new Date(dateStart.getTime());
+          // //(date);
+
+          var dates = [];
+          while (date <= dateEnd) {
+            dates.push(new Date(date));
+            date.setDate(date.getDate() + 1);
+          }
+
+          dates.pop();
+          // setDisabled([...disabled, dates]);
+          disabledDates.push(dates);
+          // //(dates);
+          for (let index = 0; index < dates.length; index++) {
+            const element = dates[index];
+            //(element);
+            setDisabled((current) => [...current, element]);
+          }
+          // //("pushed");
+          // //(dates);
+          // //(JSON.stringify(dates));
+          // while (dateStart < dateEnd) {
+          //   //("dateStart");
+          //   //(dateEnd);
+          //   let newDate = dateStart.getDate() + 1;
+          //   let loop = new Date(newDate);
+          // }
+        }
+        // this.setState({ persons });
+      })
+      .catch((err) => {
+        if (err.response.status == 500) {
+          navigate("*");
+        }
+      });
   }, []);
 
-  useEffect(() => {
-    console.log(room.images);
-  }, [room]);
   //   const classes = useStyles();
 
   const [index, setActiveStep] = React.useState(0);
@@ -249,9 +253,7 @@ const Single = ({
         <hr />
       </div>
       <div className="px-10 2md:px-32  py-5 ">
-        <p className=" font-semibold  mx-auto  ">
-          A randomly generated room with random features.
-        </p>
+        <p className=" font-semibold  mx-auto  ">{room.summary} </p>
         <p className=" font-medium items-center">
           <p className="  ">
             <p className="flex items-center">
@@ -261,20 +263,15 @@ const Single = ({
               <p>{room.reviews?.length} reviews</p>
             </p>
           </p>
-          <p className="  ">
-            <p> {room.address}</p>
+          <p className="underline font-semibold  ">
+            <a
+              target="_blank"
+              href={`https://www.google.com/maps/dir/${latitude},${longitude}/${room.location?.coordinates[1]},${room.location?.coordinates[0]}/`}
+            >
+              {" "}
+              {room.address}
+            </a>
           </p>
-          <a
-            href={`https://www.google.com/maps/dir/${latitude},${longitude}/${room.latitude},${room.longitude}/`}
-            style={{
-              textDecoration: "none",
-              color: "#2F7AFF",
-              marginTop: "0px",
-              cursor: "pointer",
-            }}
-          >
-            &nbsp;&nbsp;View on maps
-          </a>
         </p>
       </div>
       <br />
@@ -295,15 +292,15 @@ const Single = ({
               <p className="text-2xl font-medium   ">
                 {room.houseType} hosted by {User.name}
               </p>
-              <p className="">
+              <p className="font-normal">
                 {" "}
                 {room.guests} guests · {room.total_bedrooms} bedrooms ·{" "}
-                {room.total_bathrooms} baths · {room.total_occupancy} sq. ft
+                {room.total_bathrooms} bath(s) · {room.total_occupancy} sq. ft
               </p>
             </div>
             <div className="right__title__profile">
               <img
-                src="https://t4.ftcdn.net/jpg/03/31/69/91/360_F_331699188_lRpvqxO5QRtwOM05gR50ImaaJgBx68vi.jpg"
+                src={User.profile_image}
                 className="h-14 w-14 rounded-full object-cover"
                 alt=""
               />
@@ -407,10 +404,10 @@ const Single = ({
                 <p className="font-medium">${room.price}&nbsp;</p>
                 <p className="text-base mt-1">night</p>
               </div>
-              <div className="right flex items-center">
+              <div className="right flex items-center ">
                 <i class="fa-solid fa-star text-xs"></i>&nbsp;{" "}
                 <p className="flex items-center">
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium ">
                     {reviewRatio > 0 ? (
                       <>{Math.round(reviewRatio)} </>
                     ) : (
@@ -456,7 +453,7 @@ const Single = ({
             {showCalendar ? (
               <div
                 ref={wrapperRef}
-                className="day-picker bg-slate-400 absolute top-[80rem]"
+                className="day-picker bg-slate-400 absolute top-[70rem]"
                 style={{
                   width: "279px",
                   paddingLeft: "-20",
@@ -488,6 +485,10 @@ const Single = ({
                     setReserve(true);
                     return toast.error("Please select a date");
                   }
+                  if (!localStorage.getItem("token")) {
+                    setReserve(true);
+                    return toast.error("Please login");
+                  }
                   setReserve(false);
                   const requestOptions = {
                     method: "POST",
@@ -496,13 +497,13 @@ const Single = ({
                       token: `${localStorage.getItem("token")}`,
                     },
                     body: JSON.stringify({
-                      dateStart: range.from,
+                      dateStartB: range.from,
                       dateEnd: range.to,
                       room: room._id,
                       guests: guestsInp,
                     }),
                   };
-                  fetch("http://localhost:7000/reserve", requestOptions)
+                  fetch("http://localhost:7000/api/reserve", requestOptions)
                     .then(async (response) => {
                       const isJson = response.headers
                         .get("content-type")
@@ -773,8 +774,64 @@ const Single = ({
                 </p>
               </div>
             </div>
+            <br />
+            <p className=" text-center text-gray-400">
+              <i class="fa-solid fa-phone"></i>&nbsp;{User.phone}
+            </p>
           </div>
         </div>
+      </div>
+      <div className="reviews__section mx-auto  w-48 mt-16">
+        <div className="reviews__summary">
+          <h1
+            className={`flex items-center ${
+              room.reviews?.length > 0 ? "w-[4.8rem]" : "w-full"
+            }  justify-between mx-auto`}
+          >
+            <i class="fa-solid fa-star text-3xl"></i>{" "}
+            {reviewRatio > 0 ? (
+              <p className="text-3xl">{Math.round(reviewRatio)} &nbsp;&nbsp;</p>
+            ) : (
+              <p className="text-3xl font-semibold">No reviews</p>
+            )}
+          </h1>
+          <p className="underline -mt-0.5  text-center">
+            {room.reviews?.length} reviews
+          </p>{" "}
+        </div>
+      </div>
+      <br />
+      <div className="reviews mx-28">
+        {/* {reviews?.map((review) => ( */}
+        <br />
+        <br />
+        {room.reviews?.map((room) => (
+          <>
+            <div className=" min-h-16   ">
+              <div className="top flex items-center space-x-3">
+                <div className="profile">
+                  <img
+                    src={room.reviewer_id.profile_image}
+                    alt=""
+                    className="h-16 w-16 border border-gray-200  object-cover rounded-full"
+                  />
+                </div>
+                <div className="name ">
+                  <p className="font-semibold">{room.reviewer_id.name}</p>
+                  <p className="font-medium text-[#595e66]">
+                    <i class="fa-solid fa-star"></i> {room.raiting_num}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2 ">{room.raiting_content}</p>
+            </div>
+
+            <br />
+            <br />
+          </>
+        ))}
+
+        {/* ))} */}
       </div>
     </div>
   );

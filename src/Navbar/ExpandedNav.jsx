@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import TypeSelection from "./TypeSelection";
 const ExpandedNav = ({
   locationInp,
   setLocationInp,
@@ -116,7 +117,7 @@ const ExpandedNav = ({
                   onBlur={() => {
                     setTimeout(() => {
                       setShowtype(false);
-                    }, 100);
+                    }, 500);
                   }}
                 />
               </div>
@@ -155,8 +156,10 @@ const ExpandedNav = ({
 
                       <div
                         onClick={() => {
-                          setRoomtype("Private room");
-                          setTypevalue("Private ");
+                          setTimeout(() => {
+                            setRoomtype("Private room");
+                            setTypevalue("Private ");
+                          }, 100);
                           console.log("Test");
                         }}
                         className={`hover:bg-slate-100 py-2.5 px-3 rounded-lg cursor-pointer ${
@@ -171,8 +174,10 @@ const ExpandedNav = ({
                       </div>
                       <div
                         onClick={() => {
-                          setRoomtype("Shared room");
-                          setTypevalue("Shared");
+                          setTimeout(() => {
+                            setRoomtype("Shared room");
+                            setTypevalue("Shared");
+                          }, 100);
                           console.log("Test");
                         }}
                         className={`hover:bg-slate-100 py-2.5 px-3 rounded-lg cursor-pointer ${
@@ -187,8 +192,10 @@ const ExpandedNav = ({
                       </div>
                       <div
                         onClick={() => {
-                          setRoomtype("Entire home");
-                          setTypevalue("Entire ");
+                          setTimeout(() => {
+                            setRoomtype("Entire home");
+                            setTypevalue("Entire ");
+                          }, 100);
                           console.log("Test");
                         }}
                         className={`hover:bg-slate-100 py-2.5 px-3 rounded-lg cursor-pointer ${

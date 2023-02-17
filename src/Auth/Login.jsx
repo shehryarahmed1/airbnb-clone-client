@@ -20,9 +20,9 @@ const Login = () => {
   }
 
   return (
-    <div className="bg-[#FF595D]">
+    <div className="bg-[#FF595D] pt-16 h-screen">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="bg-white p-5 rounded-lg w-96   ">
+      <div className="bg-white p-5 rounded-lg w-96  mx-auto   ">
         <div className="create m-auto w-28  py-3  ">
           <div className="font-semibold text-3xl text-[#555555] ">Sign up</div>
         </div>
@@ -48,15 +48,10 @@ const Login = () => {
         </div>
 
         <br />
-        <div
-          onClick={() => {
-            console.log(values);
-          }}
-          className=" m-auto w-72 "
-        >
+        <div className=" m-auto w-72 ">
           {!values.email || !values.password ? (
             <button className="p-1.5 rounded-md cursor-default   bg-[#545454] text-white font-medium w-72  ">
-              Sign in
+              Log in
             </button>
           ) : (
             <button
@@ -90,7 +85,7 @@ const Login = () => {
                       setbuttonLoading(false);
                       localStorage.setItem("token", `Bearer ${data.token}`);
                       setTimeout(() => {
-                        navigate("/");
+                        location.href = "http://localhost:5173/";
                       }, 100);
                     })
                     .catch((error) => {
@@ -122,10 +117,10 @@ const Login = () => {
                     </svg>
                     <span className="sr-only">Loading...</span>
                   </div>
-                  <p>Sign in</p>
+                  <p>Log in.</p>
                 </div>
               ) : (
-                <> Sign in</>
+                <> Log in</>
               )}
             </button>
           )}
